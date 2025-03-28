@@ -59,16 +59,21 @@ def split_words(text):
     return words
 
 
-def check_spelling(trie, text):
+def check_spelling(trie, text, line_number):
     words = split_words(text)
     errors = [w for w in words if not trie.search(w.lower())]
+    output = []
 
-    if errors:
-        for e in errors:
-            text = text.replace(e, f"~~{e}~~")
-        return text
+    if not errors:
+        return None
 
-    return None
+    original_text = text
+
+    for e in errors:
+        modified_text = original_text.replace(e, f"~~{e}~~", 1)
+        output.append(f"{line_number}:{modified_text}")
+
+    return output
 
 
 def main():
@@ -83,10 +88,11 @@ def main():
 
     with open(input_file, 'r') as f:
         for line_number, l in enumerate(f, start=1):
-            corrected = check_spelling(trie, l.strip())
+            corrected = check_spelling(trie, l.strip(), line_number)
 
             if corrected:
-                print(f"{line_number}: {corrected}")
+                for c in corrected:
+                    print(c)
 
 
 if __name__ == "__main__":
